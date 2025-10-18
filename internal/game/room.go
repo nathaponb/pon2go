@@ -13,6 +13,8 @@ type Room struct {
 	ticker *time.Ticker
 }
 
+// func NewRoom()
+
 func (r *Room) run() {}
 
 func (r *Room) broardcastState() {}

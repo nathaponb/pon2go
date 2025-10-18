@@ -1,6 +1,9 @@
 package game
 
-import "log"
+import (
+	"context"
+	"log"
+)
 
 type Server struct {
 	waitingPool  map[*Player]bool
@@ -20,10 +23,13 @@ func NewServer() *Server {
 	}
 }
 
-func (s *Server) Run() {
+func (s *Server) Run(ctx context.Context) {
 	log.Println("Game server is running...")
 	for {
 		select {
+		case <-ctx.Done():
+			// cleanup resources
+			s.cleanRooms()
 		case player := <-s.Register:
 			log.Printf("Platyer %s registered", player.ID)
 			// send new register player to requestMatch channel
@@ -42,3 +48,5 @@ func (s *Server) Run() {
 		}
 	}
 }
+
+func (s *Server) cleanRooms() {}

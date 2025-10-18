@@ -6,7 +6,7 @@ import (
 	"github.com/nathaponb/pon2go/internal/game"
 )
 
-func NewApi(gs *game.Server) error {
+func NewApi(gs *game.Server) *fiber.App {
 	app := fiber.New()
 
 	app.Use("/ws", func(c *fiber.Ctx) error {
@@ -31,5 +31,6 @@ func NewApi(gs *game.Server) error {
 
 	}))
 
-	return app.Listen(":3000")
+	// return app.Listen(":3000")
+	return app
 }
