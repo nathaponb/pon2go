@@ -9,12 +9,18 @@ type Room struct {
 	ballX, ballY       float64
 	paddle1Y, paddle2Y float64
 	score1, score2     int
-	//input              chan PlayerInput
-	ticker *time.Ticker
+	Input              chan PlayerInput
+	ticker             *time.Ticker
 }
 
-// func NewRoom()
+func NewRoom(id string, player1, player2 *Player) *Room {
+	return &Room{
+		id:      id,
+		player1: player1,
+		player2: player2,
+	}
+}
 
-func (r *Room) run() {}
+func (r *Room) Run() {}
 
 func (r *Room) broardcastState() {}

@@ -44,11 +44,51 @@ func (s *Server) Run(ctx context.Context) {
 			close(player.Send)
 		case player := <-s.requestMatch:
 			log.Printf("Platyer %s requested match, Pool size: %d", player.ID, len(s.waitingPool))
-
-			//TODO: implement match-making logic
-
+			s.matchPlayers(player)
 		}
 	}
 }
 
+func (s *Server) matchPlayers(newPlayer *Player) {
+	// Check if a player is in waiting pool
+	if len(s.waitingPool) > 0 {
+		// Get the first player
+		var waitingPlayer *Player
+		for player := range s.waitingPool {
+			waitingPlayer = player
+			break
+		}
+
+		// Remove the waiting player from the waiting pool
+		delete(s.waitingPool, waitingPlayer)
+
+		log.Printf("Match found! Players: %s vs %s", waitingPlayer.ID, newPlayer.ID)
+
+		// Create new room
+		roomID := generateUniqueID()
+		newRoom := NewRoom(roomID, waitingPlayer, newPlayer)
+
+		// Map new room to game server
+		s.room[roomID] = newRoom
+
+		// Assign room back to players
+		waitingPlayer.Room = newRoom
+		newPlayer.Room = newRoom
+
+		// Start the game in another goroutine
+		go newRoom.Run()
+	} else {
+		// No active player in the waiting pool
+		s.waitingPool[newPlayer] = true
+		log.Printf("Player %s added to waiting pool. Current size: %d", newPlayer.ID, len(s.waitingPool))
+
+		// Notify the player they are waiting
+		newPlayer.Send <- []byte(`{"type": "WAITING", "message": "Waiting for an opponent..."}`)
+	}
+}
+
 func (s *Server) cleanRooms() {}
+
+func generateUniqueID() string {
+	return ""
+}

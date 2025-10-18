@@ -27,10 +27,14 @@ func NewApi(gs *game.Server) *fiber.App {
 			Send:   make(chan []byte, 256),
 		}
 
+		// Register new player into game server
 		gs.Register <- player
+
+		// Start reading and writing player input and output in separate goroutines
+		go player.ReadPump()
+		go player.WritePump()
 
 	}))
 
-	// return app.Listen(":3000")
 	return app
 }
