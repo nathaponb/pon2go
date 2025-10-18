@@ -28,8 +28,10 @@ func (s *Server) Run(ctx context.Context) {
 	for {
 		select {
 		case <-ctx.Done():
+			log.Println("Receive context cancellation, cleaning up resources and shut down game server")
 			// cleanup resources
 			s.cleanRooms()
+			return // terminates the Run() function and its goroutine.
 		case player := <-s.Register:
 			log.Printf("Platyer %s registered", player.ID)
 			// send new register player to requestMatch channel
